@@ -1,11 +1,17 @@
 const ListService = require('../services/listService');
+const MESSAGES = require('../utils/messages');
+const listValidationSchema = require('../lib/api-params-validation-schema/listValidation');
+const validateRequest = require('../middlewares/validateRequest');
 
 const listService = new ListService();
 
 class ListController {
   async createList(req, res, next) {
     try {
-      const { task } = req.body;
+      // Validate the request body against the schema
+      const validatedData = validateRequest(req.body, listValidationSchema);
+
+      const { task } = validatedData;
       const newList = await listService.createList(task);
       res.json({ list: newList });
     } catch (err) {
@@ -28,7 +34,7 @@ class ListController {
       const list = await listService.getListById(listId);
       
       if (!list) {
-        return res.status(404).json({ message: 'List not found' });
+        return res.status(404).json({ message: MESSAGES.LIST_NOT_EXISTS });
       }
 
       res.json({ list });
@@ -43,10 +49,10 @@ class ListController {
       const deletedList = await listService.deleteListById(listId);
       
       if (!deletedList) {
-        return res.status(404).json({ message: 'List not found' });
+        return res.status(404).json({ message: MESSAGES.LIST_NOT_EXISTS });
       }
 
-      res.json({ message: 'List deleted' });
+      res.json({ message: MESSAGES.LIST_DELETED });
     } catch (err) {
       next(err);
     }

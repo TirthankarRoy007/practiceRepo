@@ -1,4 +1,5 @@
 const Board = require('../models/board');
+const MESSAGES = require('../utils/messages');
 
 class BoardService {
   async createBoard(boardData) {
@@ -12,18 +13,18 @@ class BoardService {
 
   async getAllBoards() {
     try {
-        const activeBoards = await Board.find({ isDeleted: false });
-        return activeBoards;
-      } catch (err) {
-        throw err;
-      }
+      const activeBoards = await Board.find({ isDeleted: false });
+      return activeBoards;
+    } catch (err) {
+      throw err;
+    }
   }
 
   async getBoardById(boardId) {
     try {
       const board = await Board.findById(boardId);
       if (!board) {
-        throw new Error('Board not found');
+        throw new Error(MESSAGES.BOARD_NOT_EXISTS);
       }
       return board;
     } catch (err) {
@@ -33,20 +34,20 @@ class BoardService {
 
   async deleteBoardById(boardId) {
     try {
-        const deletedBoard = await Board.findByIdAndUpdate(
-          boardId,
-          { isDeleted: true },
-          { new: true }
-        );
-        
-        if (!deletedBoard) {
-          throw new Error('Board not found');
-        }
-        
-        return deletedBoard;
-      } catch (err) {
-        throw err;
+      const deletedBoard = await Board.findByIdAndUpdate(
+        boardId,
+        { isDeleted: true },
+        { new: true }
+      );
+      
+      if (!deletedBoard) {
+        throw new Error(MESSAGES.BOARD_NOT_EXISTS);
       }
+      
+      return deletedBoard;
+    } catch (err) {
+      throw err;
+    }
   }
 
   async addMemberToBoard(boardId, member) {
@@ -58,7 +59,7 @@ class BoardService {
       );
       
       if (!updatedBoard) {
-        throw new Error('Board not found');
+        throw new Error(MESSAGES.BOARD_NOT_EXISTS);
       }
       
       return updatedBoard;
@@ -76,7 +77,7 @@ class BoardService {
       );
       
       if (!updatedBoard) {
-        throw new Error('Board not found');
+        throw new Error(MESSAGES.BOARD_NOT_EXISTS);
       }
       
       return updatedBoard;

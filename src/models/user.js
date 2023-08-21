@@ -6,8 +6,18 @@ const userModel = new mongoose.Schema({
     },
     email: {
         type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
         required: true
     },
-}, { timestamps: true })
+    role: {
+        type: String,
+        enum: ['admin', 'superAdmin', 'guest'],
+        default: 'guest'
+    }
+}, { timestamps: true });
 
-module.exports = mongoose.model('user', userModel)
+module.exports = mongoose.model('user', userModel);
