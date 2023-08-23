@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const passport = require('passport')
 const UserService = require('../services/userService');
 const userValidationSchema = require('../lib/api-params-validation-schema/userValidation');
 const { SECRET_KEY } = require('../lib/config/config');
@@ -13,27 +14,32 @@ const userService = new UserService();
 class UserController {
   async loginUser(req, res, next) {
     try {
-        const { email, password } = req.body;
-
-        const user = await userService.getUserByEmail(email);
+      const { email, password } = req.body;
+  
+      passport.authenticate("local", (err, user, info) => {
+        if (err) {
+          return next(err);
+        }
         if (!user) {
-            return res.status(401).json({ message: MESSAGES.INVALID_CREDENTIALS });
+          return res.status(401).json({ message: info.message });
         }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({ message: MESSAGES.INVALID_CREDENTIALS });
-        }
-
-        const token = jwt.sign(
+  
+        req.login(user, (loginErr) => {
+          if (loginErr) {
+            return next(loginErr);
+          }
+  
+          const token = jwt.sign(
             { userId: user._id, email: user.email, role: user.role },
             SECRET_KEY,
             { expiresIn: '1h' }
-        );
-
-        res.json({ token });
+          );
+  
+          res.json({ token });
+        });
+      })(req, res, next);
     } catch (err) {
-        next(err);
+      next(err);
     }
   }
 
@@ -49,14 +55,13 @@ class UserController {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Set default role to GUEST for regular users
         const role = SYSTEM_ROLES.GUEST;
 
         const user = await userService.createUser({
             name: name,
             email: email,
             password: hashedPassword,
-            role: role  // Assign the default role
+            role: role
         });
 
         res.json({ user });
@@ -91,8 +96,6 @@ class UserController {
       if (!user) {
         return res.status(404).json({ message: MESSAGES.USER_NOT_FOUND });
       }
-  
-      // Generate and save a password reset token
       const resetToken = await userService.generatePasswordResetToken(email);
   
       const transporter = nodemailer.createTransport({
@@ -122,19 +125,7 @@ class UserController {
     } catch (err) {
       next(err);
     }
-  }  
-
-  // async resetPassword(req, res, next) {
-  //   try {
-  //     const { email, token, newPassword } = req.body;
-  
-  //     await userService.resetPassword(email, token, newPassword);
-  
-  //     res.json({ message: MESSAGES.PASSWORD_RESET_SUCCESS });
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // }
+  }
 
   async resetPassword(req, res, next) {
     try {

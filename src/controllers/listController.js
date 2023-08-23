@@ -8,7 +8,6 @@ const listService = new ListService();
 class ListController {
   async createList(req, res, next) {
     try {
-      // Validate the request body against the schema
       const validatedData = validateRequest(req.body, listValidationSchema);
 
       const { task } = validatedData;

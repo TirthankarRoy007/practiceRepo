@@ -69,40 +69,12 @@ class UserService {
     return resetToken;
   }
 
-  // async resetPassword(email, token, newPassword) {
-  //   try {
-  //     const expirationDate = new Date(Date.now() + 3600000);
-      
-  //     const user = await User.findOne({
-  //       email,
-  //       // resetPasswordToken: token,
-  //       // resetPasswordExpires: { $gt: expirationDate },
-  //     });
-      
-  //     console.log(user);
-  
-  //     if (!user) {
-  //       throw new Error('Invalid or expired token');
-  //     }
-  
-  //     const saltRounds = 10;
-  //     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-  
-  //     user.password = hashedPassword;
-  //     user.resetPasswordToken = undefined;
-  //     user.resetPasswordExpires = undefined;
-  
-  //     await user.save();
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
   async resetPassword(email, newPassword) {
     try {
       const user = await User.findOne({ email });
   
       if (!user) {
-        throw new Error(messages.USER_NOT_FOUND); // Use the appropriate user not found message
+        throw new Error(messages.USER_NOT_FOUND);
       }
   
       const saltRounds = 10;
@@ -113,7 +85,7 @@ class UserService {
       user.resetPasswordExpires = undefined;
   
       await user.save();
-      return messages.PASSWORD_RESET_SUCCESS;
+      return MESSAGES.PASSWORD_RESET_SUCCESS;
     } catch (error) {
       throw error;
     }
