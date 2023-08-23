@@ -1,0 +1,24 @@
+exports.SYSTEM_ROLES = {
+	SUPER_ADMIN: 'Super Admin',
+	SIGN_INTERPRETER: 'Sign Interpreter',
+	GUEST: 'Guest'
+}
+
+exports.EMAIL_TEMPLATES = {
+	FORGOT_PASSWORD: 'FORGOT_PASSWORD',
+	SIGN_UP: 'SIGN_UP',
+	REGISTER: 'REGISTER',
+	EXCEPTION: 'EXCEPTION',
+	USER_ACTIVITY: 'USER_ACTIVITY'
+}
+
+exports.RESOURCE_POSSESSION = {
+	OWN: 'OWN',
+	ANY: 'ANY',
+	SUB: 'SUB'
+}
+
+exports.HEADERS = {
+	ACCESS_TOKEN: 'access-token',
+	AUTH_TOKEN: 'Authorization'
+}

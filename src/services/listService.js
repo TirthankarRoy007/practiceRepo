@@ -1,11 +1,14 @@
 const List = require('../models/list');
+const logger = require('../lib/logger/logger');
 
 class ListService {
   async createList(task) {
     try {
       const newList = await List.create({ task });
+      logger.info(`List created: Task - ${newList.task}, ID - ${newList._id}`);
       return newList;
     } catch (err) {
+      logger.error('Error creating list:', err);
       throw err;
     }
   }
@@ -20,6 +23,7 @@ class ListService {
 
       return updatedList;
     } catch (err) {
+      logger.error('Error adding list to board:', err);
       throw err;
     }
   }
@@ -29,6 +33,7 @@ class ListService {
       const activeLists = await List.find({ isDeleted: false });
       return activeLists;
     } catch (err) {
+      logger.error('Error fetching all active lists:', err);
       throw err;
     }
   }
@@ -38,6 +43,7 @@ class ListService {
       const list = await List.findById(listId);
       return list;
     } catch (err) {
+      logger.error('Error fetching list by ID:', err);
       throw err;
     }
   }
@@ -50,8 +56,10 @@ class ListService {
         { new: true }
       );
 
+      logger.info(`List deleted: Task - ${updatedList.task}, ID - ${updatedList._id}`);
       return updatedList;
     } catch (err) {
+      logger.error('Error deleting list:', err);
       throw err;
     }
   }
