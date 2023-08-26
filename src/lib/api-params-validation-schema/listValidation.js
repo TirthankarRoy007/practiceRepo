@@ -1,9 +1,9 @@
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 
-const listValidationSchema = Joi.object({
-    task: Joi.string().valid('ToDo', 'InProgress', 'Done').default('ToDo'),
-    cards: Joi.array().items(Joi.string()),
-    isDeleted: Joi.boolean().default(false)
+const listSchema = Joi.object({
+  task: Joi.string().required(),
 });
 
-module.exports = listValidationSchema;
+module.exports = {
+  listSchema,
+};

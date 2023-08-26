@@ -2,7 +2,8 @@ const User = require('../models/user');
 const logger = require('../lib/logger/logger');
 const MESSAGES = require('../utils/messages');
 const uuid = require('uuid');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const { NoRecordFoundError, ConflictError } = require('../lib/errors')
 
 class UserService {
   async getUserByEmail(email) {
@@ -17,7 +18,7 @@ class UserService {
         });
 
         if (existingUser) {
-          throw new Error(MESSAGES.USER_ALREADY_EXISTS);
+          throw new ConflictError(MESSAGES.USER_ALREADY_EXISTS);
         }
       }
 
@@ -45,7 +46,7 @@ class UserService {
     try {
       const user = await User.findById(userId);
       if (!user) {
-        throw new Error(MESSAGES.USER_NOT_EXISTS);
+        throw new NoRecordFoundError(MESSAGES.USER_NOT_EXISTS);
       }
       logger.info(`User retrieved: ${user.name} (${user.email})`);
       return user;
@@ -58,7 +59,7 @@ class UserService {
   async generatePasswordResetToken(email) {
     const user = await this.getUserByEmail(email);
     if (!user) {
-      throw new Error('User not found');
+      throw new NoRecordFoundError(MESSAGES.USER_NOT_EXISTS);
     }
 
     const resetToken = uuid.v4();
@@ -74,7 +75,7 @@ class UserService {
       const user = await User.findOne({ email });
   
       if (!user) {
-        throw new Error(messages.USER_NOT_FOUND);
+        throw new NoRecordFoundError(MESSAGESUSER_NOT_FOUND);
       }
   
       const saltRounds = 10;

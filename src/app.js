@@ -1,17 +1,13 @@
 require('dotenv').config();
-const { SECRET_KEY } = require('../src/lib/config/config');
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
-const bcrypt = require('bcrypt');
-const LocalStrategy = require("passport-local").Strategy;
-const { default: mongoose } = require("mongoose");
-const UserService = require('./services/userService');
-const User = require('./models/user')
+const mongoose = require("mongoose");
 const userRoute = require("./routes/userRoute");
 const boardRoute = require("./routes/boardRoute");
 const cardRoute = require("./routes/cardRoute");
 const listRoute = require("./routes/listRoute");
+const passportLocalStrategy = require('./lib/authentication/strategy/passportEmailLocal');
 
 const app = express();
 
@@ -23,7 +19,7 @@ mongoose.connect(process.env.MONGO_URL)
   .catch((err) => console.log(err));
 
 app.use(session({
-  secret: SECRET_KEY,
+  secret: process.env.SECRET_KEY,
   resave: false,
   saveUninitialized: false,
 }));
@@ -31,41 +27,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy({
-  usernameField: "email",
-  passwordField: "password",
-}, async (email, password, done) => {
-  try {
-    const userService = new UserService();
-    const user = await userService.getUserByEmail(email);
-    if (!user) {
-      return done(null, false, { message: MESSAGES.INVALID_CREDENTIALS });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return done(null, false, { message: MESSAGES.INVALID_CREDENTIALS });
-    }
-
-    return done(null, user);
-  } catch (error) {
-    return done(error);
-  }
-}));
-
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-  UserService.getUserById(id)
-    .then(user => {
-      done(null, user);
-    })
-    .catch(error => {
-      done(error, null);
-    });
-});
+passport.use(passportLocalStrategy); 
 
 app.use("/", userRoute);
 app.use("/", boardRoute);

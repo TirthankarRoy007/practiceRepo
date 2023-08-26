@@ -1,5 +1,7 @@
 const List = require('../models/list');
 const logger = require('../lib/logger/logger');
+const { NoRecordFoundError } = require('../lib/errors')
+const MESSAGES = require('../utils/messages')
 
 class ListService {
   async createList(task) {
@@ -31,6 +33,9 @@ class ListService {
   async getAllActiveLists() {
     try {
       const activeLists = await List.find({ isDeleted: false });
+      if(!activeLists){
+        throw new NoRecordFoundError(MESSAGES.LIST_NOT_EXISTS)
+      }
       return activeLists;
     } catch (err) {
       logger.error('Error fetching all active lists:', err);
@@ -41,6 +46,9 @@ class ListService {
   async getListById(listId) {
     try {
       const list = await List.findById(listId);
+      if(!list){
+        throw new NoRecordFoundError(MESSAGES.LIST_NOT_EXISTS)
+      }
       return list;
     } catch (err) {
       logger.error('Error fetching list by ID:', err);

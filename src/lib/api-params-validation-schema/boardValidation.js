@@ -1,8 +1,15 @@
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 
-const boardValidationSchema = Joi.object({
-    name: Joi.string().required(),
-    members: Joi.array().items(Joi.string())
+const createBoardSchema = Joi.object({
+  name: Joi.string().required(),
+  members: Joi.array().items(Joi.string()).optional()
 });
 
-module.exports = boardValidationSchema;
+const memberSchema = Joi.object({
+  member: Joi.string().required()
+});
+
+module.exports = {
+  createBoardSchema,
+  memberSchema
+};

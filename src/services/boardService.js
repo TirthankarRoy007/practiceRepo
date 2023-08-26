@@ -1,6 +1,7 @@
 const Board = require('../models/board');
 const logger = require('../lib/logger/logger');
 const MESSAGES = require('../utils/messages');
+const { NoRecordFoundError } = require('../lib/errors')
 
 class BoardService {
   async createBoard(boardData) {
@@ -29,7 +30,7 @@ class BoardService {
       const board = await Board.findById(boardId);
       if (!board) {
         logger.warn(`Board not found for ID: ${boardId}`);
-        throw new Error(MESSAGES.BOARD_NOT_EXISTS);
+        throw new NoRecordFoundError(MESSAGES.BOARD_NOT_EXISTS);
       }
       return board;
     } catch (err) {
@@ -48,7 +49,7 @@ class BoardService {
 
       if (!deletedBoard) {
         logger.warn(`Board not found for deletion, ID: ${boardId}`);
-        throw new Error(MESSAGES.BOARD_NOT_EXISTS);
+        throw new NoRecordFoundError(MESSAGES.BOARD_NOT_EXISTS);
       }
 
       logger.info(`Board deleted: Name - ${deletedBoard.name}, ID - ${deletedBoard._id}`);
@@ -69,7 +70,7 @@ class BoardService {
 
       if (!updatedBoard) {
         logger.warn(`Board not found for adding member, ID: ${boardId}`);
-        throw new Error(MESSAGES.BOARD_NOT_EXISTS);
+        throw new NoRecordFoundError(MESSAGES.BOARD_NOT_EXISTS);
       }
 
       logger.info(`Member added to board - Board ID: ${boardId}, Member: ${member}`);
@@ -90,7 +91,7 @@ class BoardService {
 
       if (!updatedBoard) {
         logger.warn(`Board not found for removing member, ID: ${boardId}`);
-        throw new Error(MESSAGES.BOARD_NOT_EXISTS);
+        throw new NoRecordFoundError(MESSAGES.BOARD_NOT_EXISTS);
       }
 
       logger.info(`Member removed from board - Board ID: ${boardId}, Member: ${member}`);

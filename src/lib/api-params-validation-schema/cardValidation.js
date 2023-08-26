@@ -1,10 +1,11 @@
-const Joi = require('@hapi/joi');
+const Joi = require('joi');
 
-const cardValidationSchema = Joi.object({
-    name: Joi.string().required(),
-    description: Joi.string(),
-    assigned_user: Joi.string(),
-    isDeleted: Joi.boolean().default(false)
+const createCardSchema = Joi.object({
+  name: Joi.string().required(),
+  description: Joi.string().allow('').optional(),
+  assigned_user: Joi.string().optional()
 });
 
-module.exports = cardValidationSchema;
+module.exports = {
+  createCardSchema
+};

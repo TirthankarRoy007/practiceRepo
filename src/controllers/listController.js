@@ -1,17 +1,27 @@
 const ListService = require('../services/listService');
+const BoardService = require('../services/boardService')
 const MESSAGES = require('../utils/messages');
-const listValidationSchema = require('../lib/api-params-validation-schema/listValidation');
-const validateRequest = require('../middlewares/validateRequest');
+const { BadRequestParameterError } = require('../lib/errors');
 
 const listService = new ListService();
+const boardService = new BoardService();
 
 class ListController {
   async createList(req, res, next) {
     try {
-      const validatedData = validateRequest(req.body, listValidationSchema);
+      const boardId = req.params.boardId;
 
-      const { task } = validatedData;
+      const board = await boardService.getBoardById(boardId);
+
+      if (!board) {
+        throw new BadRequestParameterError(MESSAGES.BOARD_NOT_EXISTS);
+      }
+      const task = req.body.task;
+
       const newList = await listService.createList(task);
+      board.lists.push(newList._id);
+      await board.save();
+
       res.json({ list: newList });
     } catch (err) {
       next(err);

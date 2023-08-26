@@ -1,16 +1,12 @@
 const BoardService = require('../services/boardService');
 const MESSAGES = require('../utils/messages');
-const boardValidationSchema = require('../lib/api-params-validation-schema/boardValidation');
-const validateRequest = require('../middlewares/validateRequest');
 
 const boardService = new BoardService();
 
 class BoardController {
   async createBoard(req, res, next) {
     try {
-      const validatedData = validateRequest(req.body, boardValidationSchema);
-
-      const { name, members } = validatedData;
+      const { name, members } = req.body;
       const board = await boardService.createBoard({ name, members });
       res.json({ board });
     } catch (err) {
@@ -50,10 +46,7 @@ class BoardController {
   async addMemberToBoard(req, res, next) {
     try {
       const boardId = req.params.boardId;
-
-      const validatedData = validateRequest(req.body, boardValidationSchema);
-
-      const { member } = validatedData;
+      const { member } = req.body;
       const updatedBoard = await boardService.addMemberToBoard(boardId, member);
       res.json({ board: updatedBoard });
     } catch (err) {
@@ -64,10 +57,7 @@ class BoardController {
   async removeMemberFromBoard(req, res, next) {
     try {
       const boardId = req.params.boardId;
-
-      const validatedData = validateRequest(req.body, boardValidationSchema);
-
-      const { member } = validatedData;
+      const { member } = req.body;
       const updatedBoard = await boardService.removeMemberFromBoard(boardId, member);
       res.json({ board: updatedBoard });
     } catch (err) {
